@@ -28,6 +28,7 @@ def slack_send_mark_complete(task_title):
         "text": f"Someone just completed the task {task_title}"
         }
     response = requests.post(url, headers=headers, data=request_body)
+    
 
 def create_model(cls, model_data):
     try:

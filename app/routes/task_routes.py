@@ -7,9 +7,9 @@ from datetime import date
 import requests
 import os
 
-task_bp = Blueprint("task_bp", __name__, url_prefix="/tasks")
+bp = Blueprint("task_bp", __name__, url_prefix="/tasks")
 
-@task_bp.post("")
+@bp.post("")
 def create_task():
     request_body = request.get_json()
 
@@ -27,7 +27,7 @@ def create_task():
     # return new_task.to_dict(), 201
 
 
-@task_bp.get("")
+@bp.get("")
 def get_all_task():
     # return get_model_with_filters(Task, request.args)
     query = db.select(Task)
@@ -43,13 +43,13 @@ def get_all_task():
     return [task.to_dict() for task in tasks]
 
 
-@task_bp.get("/<id>")
+@bp.get("/<id>")
 def get_single_task(id):
     task = validate_model(Task, id)
     return Task.to_dict(task)
 
 
-@task_bp.put("/<id>")
+@bp.put("/<id>")
 def replace_task(id):
     task = validate_model(Task, id)
     request_body = request.get_json()
@@ -61,7 +61,7 @@ def replace_task(id):
 
     return Response(status=204, mimetype="application/json")
 
-@task_bp.patch("/<id>/mark_complete")
+@bp.patch("/<id>/mark_complete")
 def mark_complete_task(id):
     task = validate_model(Task, id)
 
@@ -72,7 +72,7 @@ def mark_complete_task(id):
 
     return Response(status=204, mimetype="application/json")
 
-@task_bp.patch("/<id>/mark_incomplete")
+@bp.patch("/<id>/mark_incomplete")
 def mark_incomplete_task(id):
     task = validate_model(Task, id)
 
@@ -81,7 +81,7 @@ def mark_incomplete_task(id):
 
     return Response(status=204, mimetype="application/json")
 
-@task_bp.delete("/<id>")
+@bp.delete("/<id>")
 def delete_task(id):
     task =validate_model(Task, id)
 
