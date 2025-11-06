@@ -21,8 +21,7 @@ class Task(db.Model):
             title=self.title,
             description=self.description,
             is_complete=self.is_complete(),
-            # goal=self.goal.title if self.goal_id else None,
-            # goal_id=self.goal_id if self.goal_id else None
+            # goal=self.goal.title if self.goal_id else None
         )
 
         if self.goal_id:
@@ -43,15 +42,6 @@ class Task(db.Model):
             completed_at=completed_at,
             goal_id=dict_data.get("goal_id", None)
         )
-
-    # @staticmethod
-    # def from_dict(data):
-    #     return Task(
-    #         id=data["id"],
-    #         title=data["title"],
-    #         description=data["description"],
-    #         completed_at=data.get("completed_at")
-    #     )
 
 
     def is_complete(self):

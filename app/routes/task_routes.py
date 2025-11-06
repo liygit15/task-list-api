@@ -1,11 +1,9 @@
-from flask import Blueprint,request,make_response,request,Response,abort
+from flask import Blueprint,request,request,Response
 from ..models.task import Task
 from ..db import db
-from .routes_utilities import validate_model, create_model, slack_send_mark_complete
-from sqlalchemy import asc, desc
+from .routes_utilities import validate_model, create_model, slack_send_mark_complete, get_model_with_filters#, update_complete_time
 from datetime import date
-import requests
-import os
+
 
 bp = Blueprint("task_bp", __name__, url_prefix="/tasks")
 
@@ -15,38 +13,18 @@ def create_task():
 
     return create_model(Task, request_body)
 
-    # try:
-    #     new_task = Task.from_dict(request_body)
-    # except KeyError as error:
-    #     invalid = {"details": "Invalid data"}
-    #     abort(make_response(invalid, 400))
-
-    # db.session.add(new_task)
-    # db.session.commit()
-
-    # return new_task.to_dict(), 201
-
 
 @bp.get("")
 def get_all_task():
-    # return get_model_with_filters(Task, request.args)
-    query = db.select(Task)
-
-    sorted = request.args.get("sort")
-    if sorted == "asc":
-        query = query.order_by(asc(Task.title))
-    elif sorted == "desc":
-        query = query.order_by(desc(Task.title))
-
-    tasks = db.session.scalars(query)
-
-    return [task.to_dict() for task in tasks]
+    sort = request.args.get("sort")
+    
+    return get_model_with_filters(Task, sort=sort)
 
 
 @bp.get("/<id>")
 def get_single_task(id):
     task = validate_model(Task, id)
-    return Task.to_dict(task)
+    return task.to_dict()
 
 
 @bp.put("/<id>")
@@ -61,6 +39,7 @@ def replace_task(id):
 
     return Response(status=204, mimetype="application/json")
 
+
 @bp.patch("/<id>/mark_complete")
 def mark_complete_task(id):
     task = validate_model(Task, id)
@@ -72,6 +51,7 @@ def mark_complete_task(id):
 
     return Response(status=204, mimetype="application/json")
 
+
 @bp.patch("/<id>/mark_incomplete")
 def mark_incomplete_task(id):
     task = validate_model(Task, id)
@@ -81,6 +61,24 @@ def mark_incomplete_task(id):
 
     return Response(status=204, mimetype="application/json")
 
+
+#  Do I need a helper function to reduce the repeated part of patch in task_routes.py 
+# @bp.patch("/<id>/mark_complete")
+# def mark_complete_task(id):
+#     task = validate_model(Task, id)
+#     response = update_complete_time(Task, date.today())
+
+#     slack_send_mark_complete(task.title)
+#     return response
+
+
+# @bp.patch("/<id>/mark_incomplete")
+# def mark_incomplete_task(id):
+#     task = validate_model(Task, id)
+
+#     return update_complete_time(task, None)
+
+
 @bp.delete("/<id>")
 def delete_task(id):
     task =validate_model(Task, id)
@@ -89,3 +87,5 @@ def delete_task(id):
     db.session.commit()
 
     return Response(status=204, mimetype="application/json")
+
+
