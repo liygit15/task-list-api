@@ -34,7 +34,8 @@ class Task(db.Model):
     def from_dict(cls, dict_data):
         if dict_data.get("is_complete"):
             completed_at = datetime.now()
-        completed_at = None
+        else:
+            completed_at = None
 
         return cls(
             title=dict_data["title"],
